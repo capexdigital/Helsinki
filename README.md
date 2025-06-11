@@ -1,5 +1,5 @@
-<span class="fi fi-fi"></span> Full Stack Open 2025 – Notes & Exercises
-# 🇫🇮 
+🇫🇮 Full Stack Open 2025 – Notes & Exercises
+
 This repository contains my solutions and notes from the Full Stack Open course by the **University of Helsinki**.
 
 ## About the Course
