@@ -1,61 +1,42 @@
-const Header = (props) => <h1>{props.course}</h1>;
+import { useState } from 'react'
+import Note from './components/Note.jsx'
 
-const Part = (props) => (
-  <p>
-    {props.part.name} {props.part.exercises}
-  </p>
-);
+const App = (props) => {
+  const [notes, setNotes] = useState(props.notes || [])
 
-const Content = (props) => (
-  <div>
-    {props.parts.map(part => (
-      <Part key={part.id} part={part} />
-    ))}
-  </div>
-);
+const [newNote, setNewNote] = useState ('')
 
-const Total = (props) => {
-  const total = props.total.reduce((sum, part) => sum + part.exercises, 0);
-  return <p style={{fontWeight: "bold"}}>total of {total} exercises</p>;
-};
+const handleNoteChange = (event) => {
+  console.log(event.target.value)
+  setNewNote(event.target.value)
+}
 
-const Course = ({ course }) => (
-  <div>
-    <Header course={course.name} />
-    <Content parts={course.parts} />
-    <Total total={course.parts} />
-  </div>
-);
+const addNote = (event) => {
+  event.preventDefault()
+  const noteObject = {
+    content: newNote,
+    important: Math.random() < 0.5,
+    id: notes.length + 1,
+  }
 
-const App = () => {
-  const course = {
-    id: 1,
-    name: 'Half Stack application development',
-    parts: [
-      {
-        name: 'Fundamentals of React',
-        exercises: 10,
-        id: 1
-      },
-      {
-        name: 'Using props to pass data',
-        exercises: 7,
-        id: 2
-      },
-      {
-        name: 'State of a component',
-        exercises: 14,
-        id: 3
-      },
-      {
-        name: 'Redux',
-        exercises: 11,
-        id: 4
-      }
-    ],
-  };
+  setNotes(notes.concat(noteObject))
+  setNewNote('')
+}
 
-  return <Course course={course} />;
-};
+  return (
+    <div>
+      <h1>Notes</h1>
+      <ul>
+        {notes?.map(note => 
+          <Note key={note.id} note={note} />
+        )}
+      </ul>
+      <form onSubmit={addNote}>
+        <input value={newNote} onChange={handleNoteChange}/>
+        <button type="submit">save</button>
+      </form>   
+    </div>
+  )
+}
 
-export default App;
+export default App 
