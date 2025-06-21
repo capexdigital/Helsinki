@@ -1,3 +1,4 @@
+//The phonebook
 import { useState } from 'react'
 
 const App = () => {
@@ -18,6 +19,7 @@ const App = () => {
         </div>
       </form>
       <h2>Numbers</h2>
+      ...
     </div>
   )
 }
