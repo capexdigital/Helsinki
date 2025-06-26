@@ -25,7 +25,6 @@ let persons = [
 ];
 
 app.get('/', (request, response) => {
-  // Combine all HTML into a single string to be sent
   response.send(
     '<h1>Phonebook Backend</h1>' +
     '<p>Access phonebook entries at <a href="/api/persons">/api/persons</a></p>' +
@@ -38,16 +37,27 @@ app.get('/api/persons', (request, response) => {
   response.json(persons);
 });
 
-// New /info route to provide dynamic information
+// Route for getting a single phonebook entry by ID
+app.get('/api/persons/:id', (request, response) => {
+  const id = Number(request.params.id);
+  const person = persons.find(person => person.id === id);
+
+  if (person) {
+    response.json(person);
+  } else {
+    response.status(404).end();
+  }
+});
+
 app.get('/info', (request, response) => {
-    const numberOfPersons = persons.length; // Get the current number of entries
-    const requestTime = new Date(); // Get the current timestamp
+    const numberOfPersons = persons.length;
+    const requestTime = new Date();
 
     const infoResponse = {
         message: `Phonebook has info for ${numberOfPersons} people`,
-        timestamp: requestTime.toString() // Convert the date object to a readable string
+        timestamp: requestTime.toString()
     };
-    response.json(infoResponse); // Send the dynamic info as JSON
+    response.json(infoResponse);
 });
 
 const PORT = 3001;
