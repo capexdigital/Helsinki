@@ -1,5 +1,25 @@
 import React, { useState, useEffect } from 'react';
 
+// Component to display detailed information about a single country
+const CountryDetails = ({ country }) => {
+  return (
+    <div>
+      <h2>{country.name.common}</h2>
+      <p>Capital: {country.capital?.[0]}</p>
+      <p>Area: {country.area} sq km</p>
+      <h3>Languages:</h3>
+      <ul>
+        {Object.values(country.languages || {}).map((lang, index) => (
+          <li key={index}>{lang}</li>
+        ))}
+      </ul>
+      {country.flags?.png && (
+        <img src={country.flags.png} alt={country.flags.alt || `Flag of ${country.name.common}`} width="150" />
+      )}
+    </div>
+  );
+};
+
 const App = () => {
   const [countries, setCountries] = useState([]);
   const [filter, setFilter] = useState('');
@@ -86,10 +106,8 @@ const App = () => {
                 ))}
               </ul>
             ) : filteredCountries.length === 1 ? (
-              // Display single country information (placeholder for now)
-              <p>
-                Found one country: {filteredCountries[0].name.common}
-              </p>
+              // Display single country information
+              <CountryDetails country={filteredCountries[0]} />
             ) : (
               // No matches
               <p>

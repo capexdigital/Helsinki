@@ -26,4 +26,4 @@ The course covers modern web development with JavaScript, focusing on:
 - Part 10: React Native  
 - Part 11: CI/CD  
 - Part 12: Containers  
-- Part 13: Using Relational Databases 
+- Part 13: Using Relational Databases
