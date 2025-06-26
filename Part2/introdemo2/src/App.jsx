@@ -1,58 +1,106 @@
-import { useState, useEffect } from 'react'
-import axios from 'axios'
-import Note from './components/Note'
+import React, { useState, useEffect } from 'react';
 
 const App = () => {
-  const [notes, setNotes] = useState([])
-  const [newNote, setNewNote] = useState('')
-  const [showAll, setShowAll] = useState(true)
+  const [countries, setCountries] = useState([]);
+  const [filter, setFilter] = useState('');
+  const [filteredCountries, setFilteredCountries] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
+  // Fetch all country data when the component mounts
   useEffect(() => {
-    console.log('effect')
-    axios.get('http://localhost:3001/notes').then((response) => {
-      console.log('promise fulfilled')
-      setNotes(response.data)
-    })
-  }, [])
-  console.log('render', notes.length, 'notes')
+    const apiUrl = 'https://studies.cs.helsinki.fi/restcountries/api/all';
+    
+    const fetchCountries = async () => {
+      try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setCountries(data);
+      } catch (e) {
+        setError(e.message);
+        console.error('Failed to fetch countries:', e);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  const addNote = (event) => {
-    event.preventDefault()
-    const noteObject = {
-      content: newNote,
-      important: Math.random() > 0.5,
-      id: String(notes.length + 1),
+    fetchCountries();
+  }, []); // Empty dependency array means this effect runs only once
+
+  // Filter countries whenever 'countries' or 'filter' state changes
+  useEffect(() => {
+    if (filter === '') {
+      setFilteredCountries([]); // If filter is empty, show no countries
+      return;
     }
 
-    setNotes(notes.concat(noteObject))
-    setNewNote('')
-  }
+    const lowerCaseFilter = filter.toLowerCase();
 
-  const handleNoteChange = (event) => {
-    setNewNote(event.target.value)
-  }
+    const matches = countries.filter(country =>
+      country.name.common.toLowerCase().includes(lowerCaseFilter)
+    );
+    setFilteredCountries(matches);
+  }, [filter, countries]);
 
-  const notesToShow = showAll ? notes : notes.filter((note) => note.important)
+  const handleFilterChange = (event) => {
+    setFilter(event.target.value);
+  };
 
   return (
     <div>
-      <h1>Notes</h1>
       <div>
-        <button onClick={() => setShowAll(!showAll)}>
-          show {showAll ? 'important' : 'all'}
-        </button>
-      </div>
-      <ul>
-        {notesToShow.map((note) => (
-          <Note key={note.id} note={note} />
-        ))}
-      </ul>
-      <form onSubmit={addNote}>
-        <input value={newNote} onChange={handleNoteChange} />
-        <button type="submit">save</button>
-      </form>
-    </div>
-  )
-}
+        <h1>Find Countries</h1>
+        
+        <div>
+          <label htmlFor="country-input">
+            Search for a country:
+          </label>
+          <input
+            id="country-input"
+            value={filter}
+            onChange={handleFilterChange}
+            placeholder="Type country name..."
+          />
+        </div>
 
-export default App
+        {isLoading && <p>Loading countries...</p>}
+        {error && <p>Error: {error}</p>}
+
+        {!isLoading && !error && filter !== '' && (
+          <div>
+            {filteredCountries.length > 10 ? (
+              // Prompt for more specific query if too many matches
+              <p>
+                Too many matches, please make your query more specific.
+              </p>
+            ) : filteredCountries.length > 1 ? (
+              // List countries if 1 to 10 matches
+              <ul>
+                {filteredCountries.map(country => (
+                  <li key={country.cca2}>
+                    {country.name.common}
+                  </li>
+                ))}
+              </ul>
+            ) : filteredCountries.length === 1 ? (
+              // Display single country information (placeholder for now)
+              <p>
+                Found one country: {filteredCountries[0].name.common}
+              </p>
+            ) : (
+              // No matches
+              <p>
+                No countries match your search.
+              </p>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default App;
