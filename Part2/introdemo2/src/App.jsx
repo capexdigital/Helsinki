@@ -1,124 +1,146 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'
+import axios from 'axios'
+import Filter from './components/Filter'
+import PersonForm from './components/PersonForm'
+import Persons from './components/Persons'
+import personService from './services/persons'
+import './index.css'
 
-// Component to display detailed information about a single country
-const CountryDetails = ({ country }) => {
-  return (
-    <div>
-      <h2>{country.name.common}</h2>
-      <p>Capital: {country.capital?.[0]}</p>
-      <p>Area: {country.area} sq km</p>
-      <h3>Languages:</h3>
-      <ul>
-        {Object.values(country.languages || {}).map((lang, index) => (
-          <li key={index}>{lang}</li>
-        ))}
-      </ul>
-      {country.flags?.png && (
-        <img src={country.flags.png} alt={country.flags.alt || `Flag of ${country.name.common}`} width="150" />
-      )}
-    </div>
-  );
-};
+const Notification = ({ message, className }) => {
+  if (message === null) return null
+
+  return <div className={className}>{message}</div>
+}
 
 const App = () => {
-  const [countries, setCountries] = useState([]);
-  const [filter, setFilter] = useState('');
-  const [filteredCountries, setFilteredCountries] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [newFilter, setNewFilter] = useState('')
+  const [persons, setPersons] = useState([])
+  const [newName, setNewName] = useState('')
+  const [newNumber, setNewNumber] = useState('')
+  const [message, setMessage] = useState(null)
+  const [className, setClassName] = useState(null)
 
-  // Fetch all country data when the component mounts
   useEffect(() => {
-    const apiUrl = 'https://studies.cs.helsinki.fi/restcountries/api/all';
-    
-    const fetchCountries = async () => {
-      try {
-        const response = await fetch(apiUrl);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        setCountries(data);
-      } catch (e) {
-        setError(e.message);
-        console.error('Failed to fetch countries:', e);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    personService.getAll().then((allPersons) => {
+      setPersons(allPersons)
+    })
+  }, [])
 
-    fetchCountries();
-  }, []); // Empty dependency array means this effect runs only once
-
-  // Filter countries whenever 'countries' or 'filter' state changes
-  useEffect(() => {
-    if (filter === '') {
-      setFilteredCountries([]); // If filter is empty, show no countries
-      return;
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    const newPerson = {
+      name: newName,
+      number: newNumber,
+      id: persons.length + 1,
     }
 
-    const lowerCaseFilter = filter.toLowerCase();
+    if (persons.findIndex((person) => person.name === newPerson.name) === -1) {
+      personService
+        .create(newPerson)
+        .then((person) => {
+          setPersons([...persons, person])
+          setClassName('success')
+          setMessage(`Added ${person.name}`)
+          setTimeout(() => {
+            setMessage(null)
+          }, 3000)
+        })
+        .catch((error) => {
+          setClassName('error')
+          setMessage(`${error.response.data.error}`)
+          setTimeout(() => {
+            setMessage(null)
+          }, 7000)
+        })
+    } else {
+      const person = persons.find((person) => person.name === newPerson.name)
+      const changedPerson = { ...person, number: newNumber }
+      const id = person.id
 
-    const matches = countries.filter(country =>
-      country.name.common.toLowerCase().includes(lowerCaseFilter)
-    );
-    setFilteredCountries(matches);
-  }, [filter, countries]);
+      if (
+        window.confirm(
+          `${newPerson.name} is already added to phonebook, ` +
+            `replace the old number with a new one?`
+        )
+      )
+        personService
+          .update(id, changedPerson)
+          .then((returnedPerson) => {
+            setPersons(
+              persons.map((person) =>
+                person.id !== id ? person : returnedPerson
+              )
+            )
+            setClassName('success')
+            setMessage(`Changed ${returnedPerson.name}`)
+            setTimeout(() => {
+              setMessage(null)
+            }, 3000)
+          })
+          .catch((error) => {
+            setClassName('error')
+            setMessage(`${error.response.data.error}`)
+            setTimeout(() => {
+              setMessage(null)
+            }, 7000)
+            setPersons(persons.filter((person) => person.id !== id))
+          })
+    }
 
-  const handleFilterChange = (event) => {
-    setFilter(event.target.value);
-  };
+    setNewName('')
+    setNewNumber('')
+  }
+
+  const handleFilterChange = (e) => {
+    setNewFilter(e.target.value)
+  }
+
+  const handleNameChange = (e) => {
+    setNewName(e.target.value)
+  }
+
+  const handleNumberChange = (e) => {
+    setNewNumber(e.target.value)
+  }
+
+  const handleDelete = (id, name) => {
+    if (window.confirm(`Delete ${name} ?`)) {
+      personService
+        .remove(id)
+        .then(setPersons(persons.filter((person) => person.id !== id)))
+        .catch((error) => {
+          setClassName('error')
+          setMessage(
+            `Information of ${name} has already been removed from server`
+          )
+          setTimeout(() => {
+            setMessage(null)
+          }, 3000)
+        })
+    }
+  }
 
   return (
     <div>
-      <div>
-        <h1>Find Countries</h1>
-        
-        <div>
-          <label htmlFor="country-input">
-            Search for a country:
-          </label>
-          <input
-            id="country-input"
-            value={filter}
-            onChange={handleFilterChange}
-            placeholder="Type country name..."
-          />
-        </div>
-
-        {isLoading && <p>Loading countries...</p>}
-        {error && <p>Error: {error}</p>}
-
-        {!isLoading && !error && filter !== '' && (
-          <div>
-            {filteredCountries.length > 10 ? (
-              // Prompt for more specific query if too many matches
-              <p>
-                Too many matches, please make your query more specific.
-              </p>
-            ) : filteredCountries.length > 1 ? (
-              // List countries if 1 to 10 matches
-              <ul>
-                {filteredCountries.map(country => (
-                  <li key={country.cca2}>
-                    {country.name.common}
-                  </li>
-                ))}
-              </ul>
-            ) : filteredCountries.length === 1 ? (
-              // Display single country information
-              <CountryDetails country={filteredCountries[0]} />
-            ) : (
-              // No matches
-              <p>
-                No countries match your search.
-              </p>
-            )}
-          </div>
-        )}
-      </div>
+      <h2>Phonebook</h2>
+      <Notification message={message} className={className} />
+      <Filter handleFilterChange={handleFilterChange} newFilter={newFilter} />
+      <h2>add a new</h2>
+      <PersonForm
+        handleSubmit={handleSubmit}
+        handleNameChange={handleNameChange}
+        handleNumberChange={handleNumberChange}
+        newName={newName}
+        newNumber={newNumber}
+      />
+      <h2>Numbers</h2>
+      <Persons
+        persons={persons}
+        newFilter={newFilter}
+        handleDelete={handleDelete}
+      />
     </div>
-  );
-};
+  )
+}
 
-export default App;
+export default App
