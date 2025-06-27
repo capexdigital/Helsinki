@@ -1,5 +1,8 @@
 const express = require('express');
+const morgan = require('morgan');
 const app = express();
+
+app.use(morgan('tiny'));
 
 let persons = [
   { 
@@ -28,7 +31,6 @@ app.get('/', (request, response) => {
   response.send(
     '<h1>Phonebook Backend</h1>' +
     '<p>Access phonebook entries at <a href="/api/persons">/api/persons</a></p>' +
-    '<h2>Backend Info</h2>' + 
     '<p>Access info at <a href="/info">/info</a></p>'
   );
 });
@@ -37,7 +39,6 @@ app.get('/api/persons', (request, response) => {
   response.json(persons);
 });
 
-// Route for getting a single phonebook entry by ID
 app.get('/api/persons/:id', (request, response) => {
   const id = Number(request.params.id);
   const person = persons.find(person => person.id === id);
@@ -49,15 +50,27 @@ app.get('/api/persons/:id', (request, response) => {
   }
 });
 
+app.delete('/api/persons/:id', (request, response) => {
+  const id = Number(request.params.id);
+  const initialLength = persons.length;
+  persons = persons.filter(person => person.id !== id);
+
+  if (persons.length < initialLength) {
+    response.status(204).end();
+  } else {
+    response.status(404).end();
+  }
+});
+
 app.get('/info', (request, response) => {
     const numberOfPersons = persons.length;
     const requestTime = new Date();
 
-    const infoResponse = {
-        message: `Phonebook has info for ${numberOfPersons} people`,
-        timestamp: requestTime.toString()
-    };
-    response.json(infoResponse);
+    const infoResponse = `
+      <p>Phonebook has info for ${numberOfPersons} people</p>
+      <p>${requestTime}</p>
+    `;
+    response.send(infoResponse);
 });
 
 const PORT = 3001;
