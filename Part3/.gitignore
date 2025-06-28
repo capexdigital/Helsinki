@@ -1,0 +1,39 @@
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-store/
+*.tgz
+
+# Production build output
+dist/
+build/ # If your build output directory is named 'build' instead of 'dist'
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+# Editor/OS specific files
+.DS_Store # macOS
+.vscode/ # VS Code settings
+.idea/   # IntelliJ/WebStorm settings
+*.sublime-project
+*.sublime-workspace
+Thumbs.db # Windows thumbnails
+
+# npm caches
+.npm/
+
+# Logs
+logs/
+*.log
+
+# Test coverage reports
+coverage/
+
+# Misc
+.cache/
+.eslintcache # ESLint cache
