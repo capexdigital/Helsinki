@@ -6,10 +6,6 @@ yarn-error.log*
 .pnpm-store/
 *.tgz
 
-# Production build output
-dist/
-build/ # If your build output directory is named 'build' instead of 'dist'
-
 # Environment variables
 .env
 .env.local
