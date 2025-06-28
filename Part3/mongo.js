@@ -22,6 +22,7 @@ const mongoDbUser = 'capex';
 const mongoDbCluster = 'cluster0.ky3nm8j.mongodb.net';
 const mongoDbName = 'phonebookApp';
 
+// CORRECTED: Construct the URL using the provided components and password
 const url = `mongodb+srv://${mongoDbUser}:${password}@${mongoDbCluster}/${mongoDbName}?retryWrites=true&w=majority&appName=Cluster0`;
 
 mongoose.set('strictQuery', false);
