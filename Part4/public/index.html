@@ -1,84 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bloglist App</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6;
-            color: #333;
-        }
-        .container {
-            max-width: 800px;
-            margin: 2rem auto;
-            padding: 1.5rem;
-            background-color: #ffffff;
-            border-radius: 0.75rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .blog-item {
-            border-bottom: 1px solid #e5e7eb;
-            padding-bottom: 1rem;
-            margin-bottom: 1rem;
-        }
-        .blog-item:last-child {
-            border-bottom: none;
-            padding-bottom: 0;
-            margin-bottom: 0;
-        }
-        button {
-            transition: background-color 0.2s ease-in-out;
-        }
-        button:hover {
-            opacity: 0.9;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bloglist App</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f3f4f6;
+      color: #333;
+    }
+    .container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 1.5rem;
+      background-color: #ffffff;
+      border-radius: 0.75rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .blog-item {
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 1rem;
+      margin-bottom: 1rem;
+    }
+    .blog-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+      margin-bottom: 0;
+    }
+    button {
+      transition: background-color 0.2s ease-in-out;
+    }
+    button:hover {
+      opacity: 0.9;
+    }
+  </style>
 </head>
 <body class="p-4">
-    <div class="container">
-        <h1 class="text-3xl font-bold mb-6 text-center text-blue-600">My Bloglist</h1>
+  <div class="container">
+    <h1 class="text-3xl font-bold mb-6 text-center text-blue-600">My Bloglist</h1>
 
-        <section class="mb-8">
-            <h2 class="text-2xl font-semibold mb-4 text-gray-800">Add New Blog</h2>
-            <form id="add-blog-form" class="space-y-4">
-                <div>
-                    <label for="title" class="block text-sm font-medium text-gray-700">Title:</label>
-                    <input type="text" id="title" name="title" required
-                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                </div>
-                <div>
-                    <label for="author" class="block text-sm font-medium text-gray-700">Author:</label>
-                    <input type="text" id="author" name="author" required
-                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                </div>
-                <div>
-                    <label for="url" class="block text-sm font-medium text-gray-700">URL:</label>
-                    <input type="url" id="url" name="url" required
-                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                </div>
-                <div>
-                    <label for="likes" class="block text-sm font-medium text-gray-700">Likes:</label>
-                    <input type="number" id="likes" name="likes" value="0" required
-                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                </div>
-                <button type="submit" class="w-full px-4 py-2 bg-blue-600 text-white font-medium rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    Add Blog
-                </button>
-            </form>
-        </section>
+    <section class="mb-8">
+      <h2 class="text-2xl font-semibold mb-4 text-gray-800">Add New Blog</h2>
+      <form id="add-blog-form" class="space-y-4">
+        <div>
+          <label for="title" class="block text-sm font-medium text-gray-700">Title:</label>
+          <input type="text" id="title" name="title" required
+            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+        </div>
+        <div>
+          <label for="author" class="block text-sm font-medium text-gray-700">Author:</label>
+          <input type="text" id="author" name="author" required
+            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+        </div>
+        <div>
+          <label for="url" class="block text-sm font-medium text-gray-700">URL:</label>
+          <input type="url" id="url" name="url" required
+            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+        </div>
+        <div>
+          <label for="likes" class="block text-sm font-medium text-gray-700">Likes:</label>
+          <input type="number" id="likes" name="likes" value="0" required
+            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+        </div>
+        <button type="submit"
+          class="w-full px-4 py-2 bg-blue-600 text-white font-medium rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+          Add Blog
+        </button>
+      </form>
+    </section>
 
-        <section>
-            <h2 class="text-2xl font-semibold mb-4 text-gray-800">Existing Blogs</h2>
-            <div id="blogs-list" class="space-y-4">
-                <p class="text-gray-500 text-center" id="loading-message">Loading blogs...</p>
-                <!-- Blogs will be loaded here by JavaScript -->
-            </div>
-        </section>
-    </div>
+    <section>
+      <h2 class="text-2xl font-semibold mb-4 text-gray-800">Existing Blogs</h2>
+      <div id="blogs-list" class="space-y-4">
+        <p class="text-gray-500 text-center" id="loading-message">Loading blogs...</p>
+        <!-- Blogs will be loaded here by JavaScript -->
+      </div>
+    </section>
+  </div>
 
-    <script src="script.js"></script>
+  <!-- ✅ Script should be here, after all DOM elements are loaded -->
+  <script src="script.js"></script>
 </body>
 </html>

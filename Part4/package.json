@@ -1,13 +1,13 @@
 {
-  "name": "notes",
+  "name": "bloglist-app",
   "version": "1.0.0",
-  "description": "",
+  "description": "A simple blog list application",
   "license": "ISC",
   "author": "capex",
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "node --watch index.js",
     "dev": "node --watch index.js",
     "test": "node --test",
     "lint": "eslint ."
