@@ -1,12 +1,16 @@
-// index.js – Node.js + Express Backend
+// index.js (Node.js Backend Server)
 
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
+// Load environment variables and configuration.
 const config = require('./utils/config');
 const logger = require('./utils/logger');
 
-// Connect to MongoDB
+// Import Express and Mongoose
+const express = require('express');
+const app = express();
+const mongoose = require('mongoose');
+const cors = require('cors');
+
+// Connect to MongoDB using the URI from the config module
 logger.info('Connecting to', config.MONGODB_URI);
 
 mongoose.connect(config.MONGODB_URI)
@@ -17,7 +21,7 @@ mongoose.connect(config.MONGODB_URI)
     logger.error('Error connecting to MongoDB:', error.message);
   });
 
-// Define Blog schema and model
+// Define the Mongoose schema for a blog entry
 const blogSchema = new mongoose.Schema({
   title: String,
   author: String,
@@ -25,70 +29,79 @@ const blogSchema = new mongoose.Schema({
   likes: Number,
 });
 
-const Blog = mongoose.model('Blog', blogSchema);
-
-// Initialize Express app
-const app = express();
-
-// Middleware
-app.use(cors());
-app.use(express.json());
-app.use(express.static('public')); // Serve static frontend files
-
-// Routes
-
-// GET all blogs
-app.get('/api/blogs', async (req, res) => {
-  try {
-    const blogs = await Blog.find({});
-    logger.info(`Returned ${blogs.length} blogs`);
-    res.json(blogs);
-  } catch (error) {
-    logger.error('Error fetching blogs:', error.message);
-    res.status(500).json({ error: 'Failed to retrieve blogs' });
+// This ensures that when Mongoose documents are converted to JSON,
+// the '_id' field is converted to a string 'id' field, and '__v' is removed.
+blogSchema.set('toJSON', {
+  transform: (document, returnedObject) => {
+    returnedObject.id = returnedObject._id.toString();
+    delete returnedObject._id;
+    delete returnedObject.__v;
   }
 });
 
-// POST new blog
-app.post('/api/blogs', async (req, res) => {
-  logger.info('Received POST /api/blogs:', req.body);
+// Create the Mongoose model from the schema
+const Blog = mongoose.model('Blog', blogSchema);
 
-  const blog = new Blog(req.body);
+// Middleware
+app.use(cors()); // Enable CORS for all routes
+app.use(express.json()); // Parse JSON request bodies
+app.use(express.static('public')); // Serve static files from the 'public' directory
+
+// API Routes
+
+// Route to get all blogs
+app.get('/api/blogs', async (request, response) => {
+  try {
+    const blogs = await Blog.find({});
+    logger.info(`Backend found ${blogs.length} blogs from DB.`);
+    response.json(blogs);
+  } catch (error) {
+    logger.error('Error fetching blogs:', error.message);
+    response.status(500).json({ error: 'Failed to retrieve blogs' });
+  }
+});
+
+// Route to add a new blog
+app.post('/api/blogs', async (request, response) => {
+  logger.info('Received POST request to /api/blogs with body:', request.body);
+
+  const blog = new Blog(request.body);
 
   try {
     const savedBlog = await blog.save();
-    logger.info('Blog saved:', savedBlog);
-    res.status(201).json(savedBlog);
+    logger.info('Blog saved successfully:', savedBlog);
+    response.status(201).json(savedBlog);
   } catch (error) {
-    logger.error('Error saving blog:', error.message);
-    res.status(400).json({ error: 'Failed to save blog', details: error.message });
+    logger.error('Error saving blog to DB:', error.message);
+    logger.error('Full error object:', error);
+    response.status(400).json({ error: 'Failed to save blog', details: error.message });
   }
 });
 
-// DELETE blog by ID
-app.delete('/api/blogs/:id', async (req, res) => {
-  const idToDelete = req.params.id;
-
+// Route to delete a single blog post by ID
+app.delete('/api/blogs/:id', async (request, response) => {
   try {
-    const deleted = await Blog.findByIdAndDelete(idToDelete);
-    if (deleted) {
-      logger.info(`Deleted blog with ID ${idToDelete}`);
-      res.status(204).end();
+    const idToDelete = request.params.id;
+    logger.info(`Attempting to delete blog with ID: ${idToDelete}`);
+    const result = await Blog.findByIdAndDelete(idToDelete);
+
+    if (result) {
+      logger.info(`Blog with ID ${idToDelete} successfully deleted.`);
+      response.status(204).end();
     } else {
-      logger.warn(`No blog found with ID ${idToDelete}`);
-      res.status(404).json({ error: 'Blog not found' });
+      logger.info(`No blog found with ID ${idToDelete} for deletion.`);
+      response.status(404).json({ error: 'Blog not found' });
     }
   } catch (error) {
-    logger.error(`Error deleting blog with ID ${idToDelete}:`, error.message);
+    logger.error(`Error deleting blog with ID ${request.params.id}:`, error.message);
     if (error.name === 'CastError') {
-      return res.status(400).json({ error: 'Invalid blog ID format' });
+      return response.status(400).json({ error: 'Invalid blog ID format' });
     }
-    res.status(500).json({ error: 'Failed to delete blog' });
+    response.status(500).json({ error: 'Failed to delete blog' });
   }
 });
 
-// Start server
-const PORT = config.PORT || 3001;
-app.listen(PORT, () => {
-  logger.info(`Server running on port ${PORT}`);
+// Start the Express server, listening on the port from the config module
+app.listen(config.PORT, () => {
+  logger.info(`Server running on port ${config.PORT}`);
 });
