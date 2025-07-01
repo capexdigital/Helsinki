@@ -1,16 +1,16 @@
 // index.js (Node.js Backend Server)
 
-// Load environment variables and configuration.
 const config = require('./utils/config');
 const logger = require('./utils/logger');
 
-// Import Express and Mongoose
 const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
 const cors = require('cors');
 
-// Connect to MongoDB using the URI from the config module
+// Import routers
+const loginRouter = require('./controllers/login'); // Import the login router
+
 logger.info('Connecting to', config.MONGODB_URI);
 
 mongoose.connect(config.MONGODB_URI)
@@ -21,7 +21,6 @@ mongoose.connect(config.MONGODB_URI)
     logger.error('Error connecting to MongoDB:', error.message);
   });
 
-// Define the Mongoose schema for a blog entry
 const blogSchema = new mongoose.Schema({
   title: String,
   author: String,
@@ -29,8 +28,6 @@ const blogSchema = new mongoose.Schema({
   likes: Number,
 });
 
-// This ensures that when Mongoose documents are converted to JSON,
-// the '_id' field is converted to a string 'id' field, and '__v' is removed.
 blogSchema.set('toJSON', {
   transform: (document, returnedObject) => {
     returnedObject.id = returnedObject._id.toString();
@@ -39,17 +36,15 @@ blogSchema.set('toJSON', {
   }
 });
 
-// Create the Mongoose model from the schema
 const Blog = mongoose.model('Blog', blogSchema);
 
-// Middleware
-app.use(cors()); // Enable CORS for all routes
-app.use(express.json()); // Parse JSON request bodies
+app.use(cors());
+app.use(express.json());
 app.use(express.static('public')); // Serve static files from the 'public' directory
 
 // API Routes
+app.use('/api/login', loginRouter); // Use the login router
 
-// Route to get all blogs
 app.get('/api/blogs', async (request, response) => {
   try {
     const blogs = await Blog.find({});
@@ -61,7 +56,6 @@ app.get('/api/blogs', async (request, response) => {
   }
 });
 
-// Route to add a new blog
 app.post('/api/blogs', async (request, response) => {
   logger.info('Received POST request to /api/blogs with body:', request.body);
 
@@ -78,7 +72,6 @@ app.post('/api/blogs', async (request, response) => {
   }
 });
 
-// Route to delete a single blog post by ID
 app.delete('/api/blogs/:id', async (request, response) => {
   try {
     const idToDelete = request.params.id;
@@ -101,7 +94,6 @@ app.delete('/api/blogs/:id', async (request, response) => {
   }
 });
 
-// Start the Express server, listening on the port from the config module
 app.listen(config.PORT, () => {
   logger.info(`Server running on port ${config.PORT}`);
 });
