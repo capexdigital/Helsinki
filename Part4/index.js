@@ -39,12 +39,18 @@ blogSchema.set('toJSON', {
 const Blog = mongoose.model('Blog', blogSchema);
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json()); // This middleware is crucial for parsing JSON bodies
 app.use(express.static('public')); // Serve static files from the 'public' directory
 
-// API Routes
-app.use('/api/login', loginRouter); // Use the login router
+// --- DEBUGGING STEP: Log request.body before it reaches the router ---
+app.use('/api/login', (req, res, next) => {
+  logger.info('Incoming request to /api/login. request.body:', req.body);
+  next(); // Pass control to the next middleware/router
+}, loginRouter);
+// --- END DEBUGGING STEP ---
 
+
+// API Routes for Blogs (existing routes)
 app.get('/api/blogs', async (request, response) => {
   try {
     const blogs = await Blog.find({});
