@@ -18,12 +18,4 @@ The course covers modern web development with JavaScript, focusing on:
 - Part 2: Communicating with Server  
 - Part 3: Programming a Server with NodeJS and Express  
 - Part 4: Testing Express Servers, User Administration  
-- Part 5: Testing React Apps  
-- Part 6: Advanced State Management  
-- Part 7: Routing, Hooks, Styling  
-- Part 8: GraphQL  
-- Part 9: TypeScript  
-- Part 10: React Native  
-- Part 11: CI/CD  
-- Part 12: Containers  
-- Part 13: Using Relational Databases
+- Part 5: GraphQL
